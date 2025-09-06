@@ -7,6 +7,10 @@ const app = express();
 // Middleware
 
 // Routes
+// Routes
+app.get('/', (req, res) => {
+    res.send('Hello Maya');
+  });
 
 // Start Server
 
