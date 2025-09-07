@@ -17,6 +17,9 @@ const app = express();
 // Allow Express (our web framework) to render HTML templates and send them back to the client using a new function
 const handlebars = require('express-handlebars');
 
+// Somewhere near the top
+app.use(express.static('public'));
+
 const hbs = handlebars.create({
     // Specify helpers which are only registered on this instance.
     helpers: {
@@ -32,18 +35,26 @@ app.set('views', './views');
 // Routes
 app.get('/', (req, res) => {
   // Handle the home page when we haven't queried yet
-  term = ""
+  let term = ""
   if (req.query.term) {
       term = req.query.term
   }
+  
+  console.log('Searching for term:', term);
+  
   // Tenor.search.Query("SEARCH KEYWORD HERE", "LIMIT HERE")
   Tenor.Search.Query(term, "10")
       .then(response => {
+          console.log('API Response:', response);
           // store the gifs we get back from the search
           const gifs = response;
           // pass the gifs as an object into the home page
           res.render('home', { gifs })
-      }).catch(console.error);
+      }).catch(error => {
+          console.error('API Error:', error);
+          // Render page with empty gifs array if API fails
+          res.render('home', { gifs: [] });
+      });
 })
 
 app.get('/greetings/:name', (req, res) => {
